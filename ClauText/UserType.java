@@ -714,19 +714,6 @@ public class UserType extends Type {
 		return temp;
 	}
 	
-	public static class Pair<First, Second>
-	{
-		public First first;
-		public Second second;
-		
-		public Pair(First first, Second second)
-		{
-			this.first = first;
-			this.second = second;
-		}
-		public Pair() { }
-	}
-	
 	// find userType! not itemList!,// this has bug
 	public static Pair<Boolean, ArrayList<UserType>> Find(UserType global, String _position) throws Exception /// option, option_offset
 	{
@@ -769,7 +756,7 @@ public class UserType extends Type {
 			int count = 0;
 
 			for (int i = 0; i < strVec.size(); ++i) {
-				if (strVec.get(i) == "..") {
+				if (strVec.get(i).equals("..")) {
 					count++;
 				}
 				else {
