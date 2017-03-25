@@ -4,10 +4,120 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 import ClauText.UserType;
 
 public class Utility {
+	// check this method! - maybe has bug!
+	private static boolean ChkComment(LinkedList<Token> strVec, UserType ut, Reserver reserver, int offset) throws Exception
+	{
+		if (strVec.size() < offset) {
+			reserver.reserve(strVec);
+			while (strVec.size() < offset) // 
+			{
+				reserver.reserve(strVec);
+				if (
+					strVec.size() < offset &&
+					reserver.end()
+					) {
+					return false;
+				}
+			}
+		}
+		
+		ListIterator<Token> x = strVec.listIterator();
+		boolean tokenHasNext = x.hasNext();
+		Token token = tokenHasNext? x.next() : null;
+		
+		int count = 0;
+
+		while(tokenHasNext) {
+			if (token.isComment) {
+				ut.PushComment(token.str);
+				// x = strVec.erase(x); in c++
+				x.remove();
+				tokenHasNext = x.hasNext();
+				token = tokenHasNext? x.next() : null;
+			}
+			else if (count == offset - 1) {
+				return true;
+			}
+			else { 
+				count++;
+				tokenHasNext = x.hasNext();
+				token = tokenHasNext? x.next() : null;
+			}
+
+			if (token == null) {
+				reserver.reserve(strVec);
+				x = strVec.listIterator(count);
+				tokenHasNext = x.hasNext();
+				token = tokenHasNext? x.next() : null;
+				while (strVec.size() < offset) // + count?
+				{
+					reserver.reserve(strVec);
+					x = strVec.listIterator(count);
+					tokenHasNext = x.hasNext();
+					token = tokenHasNext? x.next() : null;
+					if (
+						strVec.size() < offset &&
+						reserver.end()
+						) {
+						return false;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	static String Top(LinkedList<Token> strVec, UserType ut, Reserver reserver) throws Exception
+	{
+		if (strVec.isEmpty() || strVec.getFirst().isComment) {
+			if (false == ChkComment(strVec, ut, reserver, 1)) {
+				return "";
+			}
+		}
+		if (strVec.isEmpty()) { return ""; }
+		return strVec.getFirst().str;
+	}
+	static boolean Pop(LinkedList<Token> strVec, String str, UserType ut, Reserver reserver) throws Exception
+	{
+		if (strVec.isEmpty() || strVec.getFirst().isComment) {
+			if (false == ChkComment(strVec, ut, reserver, 1)) {
+				return false;
+			}
+		}
+
+		if (strVec.isEmpty()) {
+			return false;
+		}
+
+		if (str != null) {
+			str = strVec.getFirst().str;
+		}
+		strVec.removeFirst();
+
+		return true;
+	}
+
+	// lookup just one!
+	static Pair<Boolean, Token> LookUp(LinkedList<Token> strVec, UserType ut, Reserver reserver) throws Exception
+	{
+		if (!(strVec.size() >= 2 && false == strVec.getFirst().isComment && false == strVec.get(1).isComment)) {
+			if (false == ChkComment(strVec, ut, reserver, 2)) {
+				return new Pair<Boolean, Token>( false, null );
+			}
+		}
+
+		if (strVec.size() >= 2) {
+			return new Pair<Boolean, Token>( true, strVec.get(1) );
+		}
+		return new Pair<Boolean, Token>( false, null );
+	}
+
+	
 	public static Pair<Boolean, Integer> Reserve2(BufferedReader inFile, LinkedList<Token> strVec, int num) throws IOException {
 		int count = 0;
 		String temp;
