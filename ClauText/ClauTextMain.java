@@ -1,29 +1,29 @@
 
 package ClauText;
 
+import java.io.IOException;
 import java.util.LinkedList; // for test.
 import java.util.ListIterator;
 
 public class ClauTextMain {
 
-	public static void main(String[] args) {
-		LinkedList<String> test = new LinkedList<String>();
+	public static void main(String[] args) throws IOException {
+		UserType global = new UserType();
 		
-		test.add("0");
-		test.add("1");
-		test.add("2");
-		test.add("3");
-		test.add("4");
-		test.add("5");
-		
-		ListIterator x = test.listIterator(1);
-		
-		while(x.hasNext()) {
-			System.out.println(x.next());
+		long startTime = System.currentTimeMillis();
+
+		if(LoadData.LoadDataFromFile("C:/Users/wiz/Documents/Java/JClauText/input.eu4", global))
+		{
+			long endTime = System.currentTimeMillis();
+	         
+			// Total time
+			long lTime = endTime - startTime;
+			System.out.println("TIME : " + lTime + "(ms)");
+
+			System.out.println("SUCCESS");
 		}
 		
-		
-		System.out.println("Hello world!");
+		System.out.println("TEST END");
 	}
 
 }

@@ -36,6 +36,7 @@ public class Utility {
 			if (token.isComment) {
 				ut.PushComment(token.str);
 				// x = strVec.erase(x); in c++
+
 				x.remove();
 				tokenHasNext = x.hasNext();
 				token = tokenHasNext? x.next() : null;
@@ -82,6 +83,7 @@ public class Utility {
 		if (strVec.isEmpty()) { return ""; }
 		return strVec.getFirst().str;
 	}
+	
 	static boolean Pop(LinkedList<Token> strVec, String str, UserType ut, Reserver reserver) throws Exception
 	{
 		if (strVec.isEmpty() || strVec.getFirst().isComment) {
@@ -104,13 +106,14 @@ public class Utility {
 
 	// lookup just one!
 	static Pair<Boolean, Token> LookUp(LinkedList<Token> strVec, UserType ut, Reserver reserver) throws Exception
-	{
+	{	
 		if (!(strVec.size() >= 2 && false == strVec.getFirst().isComment && false == strVec.get(1).isComment)) {
 			if (false == ChkComment(strVec, ut, reserver, 2)) {
 				return new Pair<Boolean, Token>( false, null );
 			}
 		}
-
+		
+		
 		if (strVec.size() >= 2) {
 			return new Pair<Boolean, Token>( true, strVec.get(1) );
 		}

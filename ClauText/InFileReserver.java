@@ -10,8 +10,8 @@ public class InFileReserver extends Reserver
 	private int Num;
 	public InFileReserver(BufferedReader inFile)
 	{
-		InFile = inFile;
-		Num = 1;
+		this.InFile = inFile;
+		this.Num = 1;
 	}
 	public boolean end() throws IOException {  
 		InFile.mark(1);

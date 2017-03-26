@@ -36,11 +36,15 @@ public class UserType extends Type {
 	private ArrayList< ItemType > itemList;
 	private ArrayList< UserType > userTypeList;
 
-	public UserType() { super(""); parent = null; }
+	public UserType() { this(""); }
 	public UserType(String name) 
 	{
 		super(name);
 		parent = null;
+		commentList = new ArrayList<String>();
+		ilist = new ArrayList<Integer>();
+		itemList = new ArrayList< ItemType >();
+		userTypeList = new ArrayList< UserType >();
 	}
 	
 	public UserType(UserType ut) {
@@ -426,27 +430,6 @@ public class UserType extends Type {
 		}
 
 		return temp;
-	}
-
-	public boolean GetUserTypeItemRef(int idx, UserType ref)
-	{
-		ref = userTypeList.get(idx);
-		return true;
-	}
-	public boolean GetLastUserTypeItemRef(String name, UserType ref) {
-		int idx = -1;
-
-		for (int i = userTypeList.size()-1; i >= 0; --i)
-		{
-			if (name.equals(userTypeList.get(i).GetName())) {
-				idx = i;
-				break;
-			}
-		}
-		if (idx > -1) {
-			ref = userTypeList.get(idx);
-		}
-		return idx > -1;
 	}
 
 	/// save1 - like EU4 savefiles.
