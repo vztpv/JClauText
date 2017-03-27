@@ -7,9 +7,9 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class LoadData {
-	private static final String LEFT = "{";
-	private static final String RIGHT = "}";
-	private static final String EQ_STR = "=";
+	private static final WrapString LEFT = new WrapString("{");
+	private static final WrapString RIGHT = new WrapString("}");
+	private static final WrapString EQ_STR = new WrapString("=");
 	
 	private static boolean isState0( long state_reserve)
 	{
@@ -22,9 +22,8 @@ public class LoadData {
 		int braceNum = 0;
 		long state_reserve=0;
 		ArrayList< UserType > nestedUT = new ArrayList<UserType>();
-		String var1="", var2="", val="";
+		WrapString var1=new WrapString(""), var2=new WrapString(""), val=new WrapString("");
 
-		boolean varOn = false;
 		
 		nestedUT.add(null);
 		nestedUT.set(0, global);
@@ -39,7 +38,7 @@ public class LoadData {
 					strVec.isEmpty() &&
 					reserver.end()
 					) {
-					return false; // throw "Err nextToken does not exist"; // cf) or empty file or empty String!
+					return false; // throw "Err nextToken does not exist"; // cf) or empty file or empty WrapString!
 				}
 			}
 		}
@@ -63,14 +62,14 @@ public class LoadData {
 						}
 						else {
 							if (Utility.Pop(strVec, var1, nestedUT.get(braceNum), reserver)) {
-								nestedUT.get(braceNum).AddItem("", var1);
+								nestedUT.get(braceNum).AddItem(new WrapString(""), new WrapString(var1));
 								state = 0;
 							}
 						}
 					}
 					else {
 						if (Utility.Pop(strVec, var1, nestedUT.get(braceNum), reserver)) {
-							nestedUT.get(braceNum).AddItem("", var1);
+							nestedUT.get(braceNum).AddItem(new WrapString(""), new WrapString(var1));
 							state = 0;
 						}
 					}
@@ -91,7 +90,7 @@ public class LoadData {
 					Utility.Pop(strVec, null, nestedUT.get(braceNum), reserver);
 
 					///
-					UserType pTemp= new UserType(var2);
+					UserType pTemp = new UserType(new WrapString(var2));
 					nestedUT.get(braceNum).AddUserTypeItem(pTemp);
 
 					braceNum++;
@@ -107,9 +106,9 @@ public class LoadData {
 				}
 				else {
 					if (Utility.Pop(strVec, val, nestedUT.get(braceNum), reserver)) {
-						nestedUT.get(braceNum).AddItem(var2, val);
-						var2 = "";
-						val = "";
+						nestedUT.get(braceNum).AddItem(new WrapString(var2), new WrapString(val));
+						var2.data = "";
+						val.data = "";
 
 						state = 0;
 					}
@@ -140,7 +139,7 @@ public class LoadData {
 				if (LEFT.equals(Utility.Top(strVec, nestedUT.get(braceNum), reserver))) {
 					Utility.Pop(strVec, null, nestedUT.get(braceNum), reserver);
 
-					UserType temp = new UserType("");
+					UserType temp = new UserType(new WrapString(""));
 
 					nestedUT.get(braceNum).AddUserTypeItem(temp);
 					UserType pTemp = temp;
@@ -180,8 +179,8 @@ public class LoadData {
 						else {
 							// var1
 							if (Utility.Pop(strVec, var1, nestedUT.get(braceNum), reserver)) {
-								nestedUT.get(braceNum).AddItem("", var1);
-								var1 = "";
+								nestedUT.get(braceNum).AddItem(new WrapString(""), new WrapString(var1));
+								var1.data = "";
 
 								state = 4;
 							}
@@ -192,8 +191,8 @@ public class LoadData {
 						// var1
 						if (Utility.Pop(strVec, var1, nestedUT.get(braceNum), reserver))
 						{
-							nestedUT.get(braceNum).AddItem("", var1);
-							var1 = "";
+							nestedUT.get(braceNum).AddItem(new WrapString(""), new WrapString(var1));
+							var1.data = "";
 
 							state = 4;
 						}
@@ -234,9 +233,9 @@ public class LoadData {
 
 					///
 					{
-						UserType pTemp = new UserType(var2);
+						UserType pTemp = new UserType(new WrapString(var2));
 						nestedUT.get(braceNum).AddUserTypeItem(pTemp);
-						var2 = "";
+						var2 = new WrapString("");
 						braceNum++;
 
 						/// new nestedUT
@@ -252,8 +251,8 @@ public class LoadData {
 				else {
 					if (Utility.Pop(strVec, val, nestedUT.get(braceNum), reserver)) {
 
-						nestedUT.get(braceNum).AddItem(var2, val);
-						var2 = ""; val = "";
+						nestedUT.get(braceNum).AddItem(new WrapString(var2), new WrapString(val));
+						var2 = new WrapString(""); val = new WrapString("");
 						if (strVec.isEmpty())
 						{
 							//
@@ -338,14 +337,14 @@ public class LoadData {
 		return true;
 	}
 
-	public static boolean LoadDataFromFile(String fileName, UserType global) throws IOException /// global should be empty
+	public static boolean LoadDataFromFile(WrapString fileName, UserType global) throws Exception
 	{
 		UserType globalTemp=null;
 		FileReader reader=null;
 		BufferedReader inFile=null;
 			
 		try{
-			reader = new FileReader(fileName);
+			reader = new FileReader(fileName.data);
 			inFile = new BufferedReader(reader);
 			
 			globalTemp = new UserType(global);
@@ -376,16 +375,16 @@ public class LoadData {
 	}
 
 
-	public static boolean LoadDataFromString(String str, UserType ut) {
+	public static boolean LoadDataFromWrapString(WrapString str, UserType ut) {
 		UserType utTemp = new UserType();
 		LinkedList<Token>strVec = new LinkedList<Token>();
 
-		String statement=str;int token_first=0,token_last=0; // idx of token in
+		WrapString statement=str;int token_first=0,token_last=0; // idx of token in
 																// statement.
 		int state=0;
 
-		for(int i=0;i<statement.length();++i){
-			if(0==state&&'\"'==statement.charAt(i)){
+		for(int i=0;i<statement.data.length();++i){
+			if(0==state&&'\"'==statement.data.charAt(i)){
 				// token_last = i - 1;
 				// if (token_last >= 0 && token_last - token_first + 1 > 0) {
 				// strVec.emplace_back(statement.substr(token_first, token_last -
@@ -395,10 +394,10 @@ public class LoadData {
 				// token_first = i;
 				token_last=i;
 			}
-			else if(1==state && '\\'==statement.charAt(i - 1) && '\"'==statement.charAt(i)) {
+			else if(1==state && '\\'==statement.data.charAt(i - 1) && '\"'==statement.data.charAt(i)) {
 				token_last=i;
 			}
-			else if(1==state &&'\"'==statement.charAt(i)) {
+			else if(1==state &&'\"'==statement.data.charAt(i)) {
 				state=0;
 				token_last=i;
 	
@@ -407,64 +406,64 @@ public class LoadData {
 			// token_first = i + 1;
 			}
 	
-			if(0==state && '='==statement.charAt(i)) {
+			if(0==state && '='==statement.data.charAt(i)) {
 				token_last=i-1;
 				if(token_last >= 0 && token_last-token_first+1 > 0){
-					strVec.add(new Token(statement.substring(token_first,token_last+1)));
+					strVec.add(new Token(new WrapString(statement.data.substring(token_first,token_last+1))));
 				}
-				strVec.add(new Token("="));
+				strVec.add(new Token(new WrapString("=")));
 				token_first = i + 1;
 			}
-			else if(0==state && Global.isWhiteSpace(statement.charAt(i))) { // isspace																																									// etc...// ?
+			else if(0==state && Global.isWhiteSpace(statement.data.charAt(i))) { // isspace																																									// etc...// ?
 				token_last=i-1;
 				if(token_last >= 0 && token_last - token_first + 1 > 0) {
-					strVec.add(new Token(statement.substring(token_first, token_last - token_first + 1)));
+					strVec.add(new Token(new WrapString(statement.data.substring(token_first, token_last - token_first + 1))));
 				}
 				token_first = i + 1;
 			}
-			else if(0 == state && '{' == statement.charAt(i)) {
+			else if(0 == state && '{' == statement.data.charAt(i)) {
 				token_last = i - 1; 
 				if(token_last >= 0 && token_last - token_first + 1 > 0){
-					strVec.add(new Token(statement.substring(token_first, token_last+1)));
+					strVec.add(new Token(new WrapString(statement.data.substring(token_first, token_last+1))));
 				}
-				strVec.add(new Token("{"));
+				strVec.add(new Token(new WrapString("{")));
 				token_first = i + 1;
 			}
-			else if(0 == state && '}' == statement.charAt(i)) {
+			else if(0 == state && '}' == statement.data.charAt(i)) {
 				token_last = i - 1;
 				if(token_last >= 0 && token_last - token_first + 1 > 0) {
-					strVec.add(new Token(statement.substring(token_first, token_last - token_first + 1)));
+					strVec.add(new Token(new WrapString(statement.data.substring(token_first, token_last - token_first + 1))));
 				}
-				strVec.add(new Token("}"));
+				strVec.add(new Token(new WrapString("}")));
 				token_first=i+1;
 			}
 	
-			if(0 == state && '#' == statement.charAt(i)){ // different from load_data_from_file
+			if(0 == state && '#' == statement.data.charAt(i)){ // different from load_data_from_file
 				token_last=i-1;
 				if(token_last >= 0 && token_last - token_first + 1 > 0) {
-					strVec.add(new Token(statement.substring(token_first, token_last + 1)));
+					strVec.add(new Token(new WrapString(statement.data.substring(token_first, token_last + 1))));
 				}
 				int j=0;
-				for(j = i; j < statement.length(); ++j) {
-					if(statement.charAt(j) == '\n') // cf)																																								// ?
+				for(j = i; j < statement.data.length(); ++j) {
+					if(statement.data.charAt(j) == '\n') // cf)																																								// ?
 					{break;}
 				}
 				--j; // "before enter key" or "before end"
 	
 				if(j - i + 1 > 0) { 
-					strVec.add(new Token(statement.substring(i,j + 1), true));
+					strVec.add(new Token(new WrapString(statement.data.substring(i,j + 1)), true));
 				}
 				token_first=j+2;
 				i=token_first-1;
 			}
 		}
 
-		if(token_first < statement.length()){
-			strVec.add(new Token(statement.substring(token_first)));
+		if(token_first < statement.data.length()){
+			strVec.add(new Token(new WrapString(statement.data.substring(token_first))));
 		}
 
 		try{
-		// empty String!
+		// empty WrapString!
 			NoneReserver nonReserver = new NoneReserver();
 			if(false==_LoadData(strVec,nonReserver,utTemp)){
 				return true;

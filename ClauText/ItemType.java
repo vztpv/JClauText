@@ -1,16 +1,16 @@
 package ClauText;
 
 public class ItemType extends Type {
-	private String data;
+	private WrapString data;
 	private boolean inited;
 	
 	public ItemType()
 	{
-		super("");
-		this.data = "";
+		super(new WrapString(""));
+		this.data = new WrapString("");
 		this.inited = false;
 	}
-	public ItemType(String name, String value)
+	public ItemType(WrapString name, WrapString value)
 	{
 		super(name);
 		this.data = value;
@@ -18,20 +18,20 @@ public class ItemType extends Type {
 	}
 	public void Remove()
 	{
-		data = "";
+		data = new WrapString("");
 	}
-	public boolean Push(String val) throws Exception { /// do not change..!!
+	public boolean Push(WrapString val) throws Exception { /// do not change..!!
 		if (inited) { throw new Exception("ItemType already inited"); }
 		this.data = val;
 		this.inited = true;
 
 		return true;
 	}
-	public String Get() throws Exception {
+	public WrapString Get() throws Exception {
 		if (!inited) { throw new Exception("ItemType, not inited");  }
 		return this.data;
 	}
-	public void Set(String val) throws Exception {
+	public void Set(WrapString val) throws Exception {
 		if (!inited) { throw new Exception("ItemType, not inited"); } // removal?
 		this.data = val;
 	}

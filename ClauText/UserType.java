@@ -7,12 +7,12 @@ import java.util.LinkedList;
 import java.util.regex.Pattern;
 
 public class UserType extends Type {
-	public void PushComment(String comment)
+	public void PushComment(WrapString comment)
 	{
 		commentList.add(comment);
 	}
 	public int GetCommentListSize() { return commentList.size(); }
-	public String GetCommentList(int idx)  { return commentList.get(idx); }
+	public WrapString GetCommentList(int idx)  { return commentList.get(idx); }
 	public int GetIListSize() { return ilist.size(); }
 	public int GetItemListSize() { return itemList.size(); }
 	public int GetUserTypeListSize() { return userTypeList.size(); }
@@ -31,17 +31,17 @@ public class UserType extends Type {
 	public UserType GetParent() { return parent; } // when used?
 	
 	private UserType parent;
-	private ArrayList<String> commentList;
+	private ArrayList<WrapString> commentList;
 	private ArrayList<Integer> ilist;
 	private ArrayList< ItemType > itemList;
 	private ArrayList< UserType > userTypeList;
 
-	public UserType() { this(""); }
-	public UserType(String name) 
+	public UserType() { this(new WrapString("")); }
+	public UserType(WrapString name) 
 	{
 		super(name);
 		parent = null;
-		commentList = new ArrayList<String>();
+		commentList = new ArrayList<WrapString>();
 		ilist = new ArrayList<Integer>();
 		itemList = new ArrayList< ItemType >();
 		userTypeList = new ArrayList< UserType >();
@@ -140,7 +140,7 @@ public class UserType extends Type {
 			}
 		}
 	}
-	public void RemoveItemList(String varName)
+	public void RemoveItemList(WrapString varName)
 	{
 		int k = _GetIndex(ilist, 1, 0);
 		
@@ -184,7 +184,7 @@ public class UserType extends Type {
 	}
 	public void Remove()
 	{
-		/// parent.reUserType(name); - ToDo - X
+		/// parent.reUserType(new WrapString(name)); - ToDo - X
 		ilist.clear();
 		itemList.clear();
 		userTypeList.clear();
@@ -209,7 +209,7 @@ public class UserType extends Type {
 		}
 	}
 	
-	public void RemoveUserTypeList(String varName)
+	public void RemoveUserTypeList(WrapString varName)
 	{
 		int k = _GetIndex(ilist, 2, 0);
 
@@ -218,7 +218,7 @@ public class UserType extends Type {
 				k = _GetIndex(ilist, 2, k + 1);
 			}
 			else {
-				// re usertypeitem, ilist left shift 1.
+				// re usertypenew WrapString(item), ilist left shift 1.
 				ilist.remove(k);
 				k = _GetIndex(ilist, 2, k);
 			}
@@ -227,9 +227,9 @@ public class UserType extends Type {
 
 	public void RemoveList(int idx) // ilist_idx!
 	{
-		// chk whether item or usertype.
+		// chk whether new WrapString(item) or usertype.
 		// find item_idx or usertype_idx.
-		// re item or re usertype.
+		// re new WrapString(item) or re usertype.
 		if (ilist.get(idx) == 1) {
 			int item_idx = -1;
 
@@ -253,7 +253,7 @@ public class UserType extends Type {
 	public boolean empty() { return ilist.isEmpty(); }
 	
 	// chk
-	public void InsertItemByIlist(int ilist_idx, String name, String item) {
+	public void InsertItemByIlist(int ilist_idx, WrapString name, WrapString item) {
 		ilist.add(1);
 		for (int i = ilist.size()-1; i > ilist_idx; --i) {
 			ilist.set(i, ilist.get(i - 1));
@@ -302,7 +302,7 @@ public class UserType extends Type {
 	}
 	
 	// chk
-	public void InsertItem(int item_idx,  String name,  String item) {
+	public void InsertItem(int item_idx,  WrapString name,  WrapString item) {
 		int ilist_idx = _GetIlistIndex(ilist, item_idx, 1);
 
 		ilist.add(0);
@@ -318,7 +318,7 @@ public class UserType extends Type {
 		itemList.set(item_idx, new ItemType(name, item));
 	}
 	// chk
-	public void InsertUserType(int ut_idx,  UserType item) {
+	public void InsertUserType(int ut_idx, UserType item) {
 		int ilist_idx = _GetIlistIndex(ilist, ut_idx, 2);
 		UserType temp = item;
 
@@ -338,7 +338,7 @@ public class UserType extends Type {
 	}
 	
 	//
-	public void AddItem(String name, String item) {
+	public void AddItem(WrapString name, WrapString item) {
 		itemList.add(new ItemType(name, item));
 		ilist.add(1);
 	}
@@ -351,7 +351,7 @@ public class UserType extends Type {
 		userTypeList.add(temp);
 	}
 	
-	public void AddItemAtFront(String name, String item) {
+	public void AddItemAtFront(WrapString name, WrapString item) {
 		itemList.add(0, new ItemType(name, item));
 
 		ilist.add(0, 1);
@@ -366,14 +366,14 @@ public class UserType extends Type {
 		userTypeList.add(0, temp);
 	}
 	
-	public ArrayList<ItemType> GetItem(String name)  {
+	public ArrayList<ItemType> GetItem(WrapString name)  {
 		ArrayList<ItemType> temp = new ArrayList<ItemType>();
 		
-		if (name.startsWith("$.") && name.length() >= 5) {
-			String regex = name.substring(3, name.length() - 1); // -1 . " , end?
+		if (name.data.startsWith("$.") && name.data.length() >= 5) {
+			String regex = name.data.substring(3, name.data.length() - 1); // -1 . " , end?
 
 			for (int i = 0; i < itemList.size(); ++i) {
-				if (Pattern.matches(regex, itemList.get(i).GetName())) {
+				if (Pattern.matches(regex, itemList.get(i).GetName().data)) {
 					temp.add(itemList.get(i));
 				}
 			}
@@ -388,7 +388,7 @@ public class UserType extends Type {
 		return temp;
 	}
 	// regex to SetItem?
-	public boolean SetItem(String name, String value) throws Exception {
+	public boolean SetItem(WrapString name, WrapString value) throws Exception {
 		int index = -1;
 
 		for (int i = 0; i < itemList.size(); ++i) {
@@ -402,12 +402,12 @@ public class UserType extends Type {
 		return -1 != index;
 	}
 	/// add set Data
-	public boolean SetItem(int var_idx,  String value) throws Exception {
+	public boolean SetItem(int var_idx,  WrapString value) throws Exception {
 		itemList.get(var_idx).Set(value);
 		return true;
 	}
 	
-	public ArrayList<UserType> GetUserTypeItem(String name)  { /// chk...
+	public ArrayList<UserType> GetUserTypeItem(WrapString name)  { /// chk...
 		ArrayList<UserType> temp = new ArrayList<UserType>();
 
 		for (int i = 0; i < userTypeList.size(); ++i) {
@@ -420,7 +420,7 @@ public class UserType extends Type {
 	}
 
 	// deep copy.
-	public ArrayList<UserType> GetCopyUserTypeItem(String name)  { /// chk...
+	public ArrayList<UserType> GetCopyUserTypeItem(WrapString name)  { /// chk...
 		ArrayList<UserType> temp = new ArrayList<UserType>();
 
 		for (int i = 0; i < userTypeList.size(); ++i) {
@@ -445,7 +445,7 @@ public class UserType extends Type {
 			for (int k = 0; k < depth; ++k) {
 				stream.write("\t");
 			}
-			stream.write(ut.commentList.get(i));
+			stream.write(ut.commentList.get(i).data);
 
 			if (i < ut.commentList.size() - 1 || false == ut.ilist.isEmpty()) {
 				stream.write("\n");
@@ -456,7 +456,7 @@ public class UserType extends Type {
 			//cout << "ItemList" << endl;
 			if (ut.ilist.get(i) == 1) {
 				for (int j = 0; j < ut.itemList.get(itemListCount).size(); j++) {
-					String temp="";
+					String temp = "";
 					for (int k = 0; k < depth; ++k) {
 						temp += "\t";
 					}
@@ -515,7 +515,7 @@ public class UserType extends Type {
 			for (int k = 0; k < depth; ++k) {
 				stream.write("\t");
 			}
-			stream.write (ut.commentList.get(i));
+			stream.write (ut.commentList.get(i).data);
 
 			if (i < ut.commentList.size() - 1 || false == ut.ilist.isEmpty()) {
 				stream.write("\n");
@@ -529,9 +529,9 @@ public class UserType extends Type {
 					for (int k = 0; k < depth; ++k) {
 						stream.write("\t");
 					}
-					if (ut.itemList.get(itemListCount).GetName() != "")
+					if (ut.itemList.get(itemListCount).GetName().data.equals("") == false)
 						stream.write(ut.itemList.get(itemListCount).GetName() + " = ");
-					stream.write(ut.itemList.get(itemListCount).Get());
+					stream.write(ut.itemList.get(itemListCount).Get().data);
 					if (j != ut.itemList.get(itemListCount).size() - 1)
 						stream.write(" ");
 				}
@@ -569,14 +569,14 @@ public class UserType extends Type {
 	public void Save2(BufferedWriter stream) throws Exception  {
 		Save2(stream, this);
 	}
-	public String ItemListToString() throws Exception
+	public WrapString ItemListToWrapString() throws Exception
 	{
-		String temp="";
+		String temp = "";
 		int itemListCount = 0;
 
 		for (int i = 0; i < itemList.size(); ++i) {
 			for (int j = 0; j < itemList.get(itemListCount).size(); j++) {
-				if (itemList.get(itemListCount).GetName().isEmpty() == false)
+				if (itemList.get(itemListCount).GetName().data.isEmpty() == false)
 					temp = temp + itemList.get(itemListCount).GetName() + " = ";
 				temp = temp + itemList.get(itemListCount).Get();
 				if (j != itemList.get(itemListCount).size() - 1) {
@@ -589,16 +589,16 @@ public class UserType extends Type {
 			}
 			itemListCount++;
 		}
-		return temp;
+		return new WrapString(temp);
 	}
-	public String ItemListNamesToString()
+	public WrapString ItemListNamesToWrapString()
 	{
 		String temp="";
 		int itemListCount = 0;
 
 		for (int i = 0; i < itemList.size(); ++i) {
 			for (int j = 0; j < itemList.get(itemListCount).size(); j++) {
-				if (itemList.get(itemListCount).GetName().isEmpty() == false)
+				if (itemList.get(itemListCount).GetName().data.isEmpty() == false)
 					temp = temp + itemList.get(itemListCount).GetName();
 				else
 					temp = temp + " ";
@@ -613,32 +613,32 @@ public class UserType extends Type {
 			}
 			itemListCount++;
 		}
-		return temp;
+		return new WrapString(temp);
 	}
-	public ArrayList<String> userTypeListNamesToStringArray()
+	public ArrayList<WrapString> userTypeListNamesToWrapStringArray()
 	{
-		ArrayList<String> temp = new ArrayList<String>();
+		ArrayList<WrapString> temp = new ArrayList<WrapString>();
 		int userTypeListCount = 0;
 
 		for (int i = 0; i < userTypeList.size(); ++i) {
-			if (userTypeList.get(userTypeListCount).GetName().isEmpty() == false) {
+			if (userTypeList.get(userTypeListCount).GetName().data.isEmpty() == false) {
 				temp.add(userTypeList.get(userTypeListCount).GetName());
 			}
 			else {
-				temp.add(" "); // chk!! cf) wiz::load_data::Utility::Find function...
+				temp.add(new WrapString(" ")); // chk!! cf) wiz::load_data::Utility::Find function...
 			}
 			userTypeListCount++;
 		}
 		return temp;
 	}
-	public String UserTypeListNamesToString()
+	public WrapString UserTypeListNamesToWrapString()
 	{
 		String temp="";
 		int userTypeListCount = 0;
 
 		for (int i = 0; i < userTypeList.size(); ++i) {
-			if (userTypeList.get(userTypeListCount).GetName().isEmpty() == false) {
-				temp = temp + userTypeList.get(userTypeListCount).GetName();
+			if (userTypeList.get(userTypeListCount).GetName().data.isEmpty() == false) {
+				temp = temp + userTypeList.get(userTypeListCount).GetName().data;
 			}
 			else {
 				temp = temp + " "; // chk!! cf) wiz::load_data::Utility::Find function...
@@ -650,9 +650,9 @@ public class UserType extends Type {
 			}
 			userTypeListCount++;
 		}
-		return temp;
+		return new WrapString(temp);
 	}
-	public String ToString() throws Exception
+	public WrapString ToWrapString() throws Exception
 	{
 		String temp="";
 		int itemListCount = 0;
@@ -662,7 +662,7 @@ public class UserType extends Type {
 			//cout << "ItemList" << endl;
 			if (ilist.get(i) == 1) {
 				for (int j = 0; j < itemList.get(itemListCount).size(); j++) {
-					if (itemList.get(itemListCount).GetName() != "") {
+					if (itemList.get(itemListCount).GetName().data.equals("") == false) {
 						temp += (itemList.get(itemListCount).GetName());
 						temp += (" = ");
 					}
@@ -679,12 +679,12 @@ public class UserType extends Type {
 			}
 			else if (ilist.get(i) == 2) {
 				// cout << "UserTypeList" << endl;
-				if (userTypeList.get(userTypeListCount).GetName() != "") {
+				if (userTypeList.get(userTypeListCount).GetName().data.equals("") == false) {
 					temp += (userTypeList.get(userTypeListCount).GetName());
 					temp += (" = ");
 				}
 				temp += ( " { ");
-				temp += (userTypeList.get(userTypeListCount).ToString());
+				temp += (userTypeList.get(userTypeListCount).ToWrapString());
 				temp += (" ");
 				temp += (" }");
 				if (i != ilist.size() - 1) {
@@ -694,35 +694,35 @@ public class UserType extends Type {
 				userTypeListCount++;
 			}
 		}
-		return temp;
+		return new WrapString(temp);
 	}
 	
-	// find userType! not itemList!,// this has bug
-	public static Pair<Boolean, ArrayList<UserType>> Find(UserType global, String _position) throws Exception /// option, option_offset
+	// find userType! not  itemList!,// this has bug
+	public static Pair<Boolean, ArrayList<UserType>> Find(UserType global, WrapString _position) throws Exception /// option, option_offset
 	{
-		String position = _position;
+		WrapString position = _position;
 		ArrayList< UserType > temp = new ArrayList<UserType>();
 
-		if (!position.isEmpty() && position.charAt(0) == '@') { position = position.substring(1); }
-		if (position.isEmpty()) { temp.add(global); return new Pair<Boolean, ArrayList<UserType>>(true, temp); }
-		if (position == ".") { temp.add(global); return new Pair<Boolean, ArrayList<UserType>>(true, temp); }
-		if (position == "/./") { temp.add(global); return new Pair<Boolean, ArrayList<UserType>>(true, temp); } // chk..
-		if (position == "/.") { temp.add(global); return new Pair<Boolean, ArrayList<UserType>>(true, temp); }
-		if (position.startsWith("/."))
+		if (!position.data.isEmpty() && position.data.charAt(0) == '@') { position.data = position.data.substring(1); }
+		if (position.data.isEmpty()) { temp.add(global); return new Pair<Boolean, ArrayList<UserType>>(true, temp); }
+		if (position.data == ".") { temp.add(global); return new Pair<Boolean, ArrayList<UserType>>(true, temp); }
+		if (position.data == "/./") { temp.add(global); return new Pair<Boolean, ArrayList<UserType>>(true, temp); } // chk..
+		if (position.data == "/.") { temp.add(global); return new Pair<Boolean, ArrayList<UserType>>(true, temp); }
+		if (position.data.startsWith("/."))
 		{
-			position = position.substring(3);
+			position.data = position.data.substring(3);
 		}
 
-		ClauText.StringTokenizer tokenizer = new ClauText.StringTokenizer(position, "/");
-		ArrayList<String> strVec = new ArrayList<String>();
+		ClauText.WrapStringTokenizer tokenizer = new ClauText.WrapStringTokenizer(position, new WrapString("/"));
+		ArrayList<WrapString> strVec = new ArrayList<WrapString>();
 		LinkedList<Pair<UserType, Integer>> utDeck = new LinkedList<Pair<UserType, Integer>>();
 		Pair<UserType, Integer> utTemp = new Pair<UserType, Integer>();
 		utTemp.first = global;
 		utTemp.second = 0;
 
 		for (int i = 0; i < tokenizer.countTokens(); ++i) {
-			String strTemp = tokenizer.nextToken();
-			if (strTemp == "root" && i == 0) {
+			WrapString strTemp = tokenizer.nextToken();
+			if (strTemp.data.equals("root") && i == 0) {
 			}
 			else {
 				strVec.add(strTemp);
@@ -730,7 +730,7 @@ public class UserType extends Type {
 
 			if ((strVec.size() >= 1) && (strVec.get(strVec.size() - 1).equals(" "))) /// chk!!
 			{
-				strVec.set(strVec.size() - 1, "");
+				strVec.set(strVec.size() - 1, new WrapString(""));
 			}
 		}
 
@@ -766,10 +766,10 @@ public class UserType extends Type {
 			utDeck.removeFirst();
 			
 			if (utTemp.second < strVec.size() &&
-					strVec.get(utTemp.second).startsWith("$ut")
+					strVec.get(utTemp.second).data.startsWith("$ut")
 				)
 			{
-				int idx = Integer.parseInt(strVec.get(utTemp.second).substring(3));
+				int idx = Integer.parseInt(strVec.get(utTemp.second).data.substring(3));
 
 				if (idx < 0 || idx >= utTemp.first.GetUserTypeListSize()) {
 					throw new Exception("ERROR NOT VALID IDX");
@@ -784,12 +784,12 @@ public class UserType extends Type {
 					utDeck.addFirst(new Pair<UserType, Integer>(x, utTemp.second + 1));
 				}
 			}
-			else if (utTemp.second < strVec.size() && strVec.get(utTemp.second).startsWith("$.")) /// $."abc"
+			else if (utTemp.second < strVec.size() && strVec.get(utTemp.second).data.startsWith("$.")) /// $."abc"
 			{
-				String rex_str = strVec.get(utTemp.second).substring(3, strVec.get(utTemp.second).length() - 1);
+				String rex_str = strVec.get(utTemp.second).data.substring(3, strVec.get(utTemp.second).data.length() - 1);
 
 				for (int j = utTemp.first.GetUserTypeListSize() - 1; j >= 0; --j) {
-					if (Pattern.matches(rex_str, utTemp.first.GetUserTypeList(j).GetName())) {
+					if (Pattern.matches(rex_str, utTemp.first.GetUserTypeList(j).GetName().data)) {
 						UserType x = utTemp.first.GetUserTypeList(j);
 						utDeck.addFirst(new Pair<UserType, Integer>(x, utTemp.second + 1));
 					}
