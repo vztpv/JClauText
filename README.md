@@ -1,2 +1,2 @@
 # JClauText
-Java implementation of ClauText
+Java implementation of ClauText, ( slow? need to speed up? )
